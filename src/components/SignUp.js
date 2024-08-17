@@ -16,6 +16,13 @@ function SignUp() {
     else console.log('Signed up successfully');
   };
 
+  const handleGoogleSignUp = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+    if (error) console.error('Error signing up with Google:', error.message);
+  };
+
   return (
     <Box
       sx={{
@@ -61,6 +68,17 @@ function SignUp() {
             sx={{ py: 1.5 }}
           >
             Sign Up
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            fullWidth
+            variant="outlined"
+            color="secondary"
+            onClick={handleGoogleSignUp}
+            sx={{ py: 1.5 }}
+          >
+            Sign Up with Google
           </Button>
         </Grid>
       </Grid>
