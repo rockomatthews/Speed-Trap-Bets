@@ -1,26 +1,40 @@
 // src/components/SignUp.js
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { Button, TextField, Box, Typography, Grid } from '@mui/material';
+import { Button, TextField, Box, Typography, Grid, Snackbar, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSignUp = async () => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
     });
-    if (error) console.error('Error signing up:', error.message);
-    else console.log('Signed up successfully');
+    if (error) {
+      console.error('Error signing up:', error.message);
+      setSnackbarMessage('Error signing up: ' + error.message);
+      setShowSnackbar(true);
+    } else {
+      setSnackbarMessage('Sign up successful! Please check your email to verify your account.');
+      setShowSnackbar(true);
+    }
   };
 
   const handleGoogleSignUp = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
     });
-    if (error) console.error('Error signing up with Google:', error.message);
+    if (error) {
+      console.error('Error signing up with Google:', error.message);
+      setSnackbarMessage('Error signing up with Google: ' + error.message);
+      setShowSnackbar(true);
+    }
   };
 
   return (
@@ -82,6 +96,15 @@ function SignUp() {
           </Button>
         </Grid>
       </Grid>
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setShowSnackbar(false)}
+      >
+        <Alert onClose={() => setShowSnackbar(false)} severity="info" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
