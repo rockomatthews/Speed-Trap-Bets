@@ -1,5 +1,6 @@
 import React from 'react';
 import { supabase } from '../supabaseClient';
+import Header from '../components/Header';
 import { Button, Box, Typography } from '@mui/material';
 
 function Dashboard() {
@@ -19,10 +20,7 @@ function Dashboard() {
         flexDirection: 'column',
       }}
     >
-      <Typography variant="h4">Welcome to the Dashboard!</Typography>
-      <Button variant="contained" onClick={handleLogout}>
-        Log Out
-      </Button>
+      <Header />
     </Box>
   );
 }
