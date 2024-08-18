@@ -18,6 +18,7 @@ app.use(express.static(path.join(__dirname, '../build')));
 
 // Define API route for authentication with the iRacing API
 app.post('/api/authenticate', async (req, res) => {
+  console.log('Received POST request to /api/authenticate');
   try {
     const cookies = await iRacingApi.authenticate();
     res.json({ cookies });
