@@ -4,16 +4,18 @@ const supabase = require('./supabaseClient'); // Import the Supabase client
 
 const IRACING_EMAIL = process.env.IRACING_EMAIL;
 const IRACING_PASSWORD = process.env.IRACING_PASSWORD;
+let cookies = null; // Store cookies globally to manage sessions
 
 // Function to authenticate with the iRacing API
 const authenticate = async () => {
   try {
-    const passwordHash = await encodePassword(IRACING_EMAIL, IRACING_PASSWORD);
+    const passwordHash = encodePassword(IRACING_EMAIL, IRACING_PASSWORD);
     const response = await axios.post('https://members-ng.iracing.com/auth', {
       email: IRACING_EMAIL,
       password: passwordHash,
     });
-    const cookies = response.headers['set-cookie'];
+    cookies = response.headers['set-cookie'];
+    console.log('Authenticated with iRacing');
     return cookies;
   } catch (error) {
     console.error('Error during authentication:', error.message);
@@ -28,10 +30,21 @@ const encodePassword = (email, password) => {
   return CryptoJS.enc.Base64.stringify(hash);
 };
 
+// Function to refresh authentication periodically
+const refreshAuthentication = async () => {
+  try {
+    await authenticate();
+  } catch (error) {
+    console.error('Error refreshing iRacing authentication:', error.message);
+  }
+};
+
 // Function to search for a driver by name in the iRacing API
 const searchDriver = async (name) => {
   try {
-    const cookies = await authenticate();
+    if (!cookies) {
+      await authenticate();
+    }
     const response = await axios.get('https://members-ng.iracing.com/data/member/get', {
       headers: {
         Cookie: cookies.join('; '),
@@ -53,15 +66,13 @@ const saveUser = async (email, passwordHash) => {
   try {
     const { data, error } = await supabase
       .from('Users')
-      .insert([
-        { email, password_hash: passwordHash }
-      ]);
+      .insert([{ email, password_hash: passwordHash }]);
 
     if (error) {
       console.error('Error saving user to Supabase:', error.message);
       throw new Error('Failed to save user');
     }
-    
+
     console.log('User saved to Supabase:', data);
     return data;
   } catch (error) {
@@ -75,9 +86,7 @@ const saveDriverSearchResult = async (searchTerm, result) => {
   try {
     const { data, error } = await supabase
       .from('DriverSearchCache')
-      .insert([
-        { search_term: searchTerm, result }
-      ]);
+      .insert([{ search_term: searchTerm, result }]);
 
     if (error) {
       console.error('Error saving driver search result to Supabase:', error.message);
@@ -94,6 +103,7 @@ const saveDriverSearchResult = async (searchTerm, result) => {
 
 module.exports = {
   authenticate,
+  refreshAuthentication,
   searchDriver,
   saveUser,
   saveDriverSearchResult,
