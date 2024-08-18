@@ -2,22 +2,40 @@ import React, { useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import Header from '../components/Header';
 import { Box } from '@mui/material';
-import { authenticate, refreshAuthentication } from '../server/iRacingApi';
 
 function Dashboard() {
   useEffect(() => {
-    // Authenticate with the iRacing API when the component mounts
+    // Authenticate with iRacing API when the component mounts
     const initAuth = async () => {
       try {
-        await authenticate();
+        const response = await fetch('/api/authenticate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to authenticate with iRacing API');
+        }
+
         console.log('Authenticated with iRacing API');
-        
+
         // Set up an interval to refresh the authentication every 15 minutes
         const refreshInterval = setInterval(async () => {
-          await refreshAuthentication();
-        }, 15 * 60 * 1000); // 15 minutes in milliseconds
+          try {
+            await fetch('/api/authenticate', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+            console.log('Refreshed iRacing API authentication');
+          } catch (error) {
+            console.error('Error refreshing iRacing API authentication:', error.message);
+          }
+        }, 15 * 60 * 1000);
 
-        // Clean up interval on component unmount
         return () => clearInterval(refreshInterval);
       } catch (error) {
         console.error('Error initializing iRacing API authentication:', error.message);
@@ -36,10 +54,9 @@ function Dashboard() {
   return (
     <Box>
       <Header />
-      {/* Main content area with top padding to prevent overlap with the fixed header */}
       <Box
         sx={{
-          marginTop: '64px', // Adjust based on the height of the AppBar (default 64px for regular AppBar)
+          marginTop: '64px',
           height: '100vh',
           display: 'flex',
           justifyContent: 'center',
