@@ -1,4 +1,3 @@
-// src/server/iRacingApi.js
 const axios = require('axios');
 const CryptoJS = require('crypto-js');
 const supabase = require('./supabaseClient'); // Import the Supabase client
