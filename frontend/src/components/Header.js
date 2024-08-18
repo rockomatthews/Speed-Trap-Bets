@@ -4,7 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 const Header = () => {
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#fde100' }}>
+    <AppBar position="fixed" sx={{ backgroundColor: '#000000' }}>
       <Toolbar>
         {/* Hamburger Menu Icon */}
         <IconButton
@@ -18,7 +18,7 @@ const Header = () => {
 
         {/* Title or Logo Placeholder */}
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          iRacing Dashboard
+          Dashboard
         </Typography>
 
         {/* Connect Wallet Button */}
@@ -32,7 +32,7 @@ const Header = () => {
             },
           }}
         >
-          Connect Your Wallet
+          Connect Wallet
         </Button>
       </Toolbar>
     </AppBar>

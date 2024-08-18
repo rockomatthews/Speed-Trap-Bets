@@ -1,7 +1,7 @@
 import React from 'react';
 import { supabase } from '../supabaseClient';
 import Header from '../components/Header';
-import { Button, Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 
 function Dashboard() {
   const handleLogout = async () => {
@@ -11,16 +11,21 @@ function Dashboard() {
   };
 
   return (
-    <Box
-      sx={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-      }}
-    >
+    <Box>
       <Header />
+      {/* Main content area with top padding to prevent overlap with the fixed header */}
+      <Box
+        sx={{
+          marginTop: '64px', // Adjust based on the height of the AppBar (default 64px for regular AppBar)
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Content goes here */}
+      </Box>
     </Box>
   );
 }
