@@ -7,6 +7,7 @@ function Dashboard() {
     // Authenticate with iRacing API when the component mounts
     const initAuth = async () => {
       try {
+        console.log('Starting authentication process...');
         const response = await fetch('/api/authenticate', {
           method: 'POST',
           headers: {
@@ -18,11 +19,13 @@ function Dashboard() {
           throw new Error('Failed to authenticate with iRacing API');
         }
 
-        console.log('Authenticated with iRacing API');
+        const data = await response.json();
+        console.log('Authenticated with iRacing API:', data);
 
         // Set up an interval to refresh the authentication every 15 minutes
         const refreshInterval = setInterval(async () => {
           try {
+            console.log('Refreshing authentication...');
             await fetch('/api/authenticate', {
               method: 'POST',
               headers: {
