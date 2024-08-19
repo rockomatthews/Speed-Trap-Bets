@@ -6,6 +6,7 @@ const express = require('express'); // Express is a web framework for Node.js
 const path = require('path'); // Path is a module to handle and transform file paths
 const bodyParser = require('body-parser'); // Body-parser is middleware to parse incoming request bodies
 const iRacingApi = require('./iRacingApi'); // Import the iRacing API module
+const supabase = require('./supabaseClient'); // Import the Supabase client
 
 // Create an instance of the Express application
 const app = express();
@@ -88,11 +89,45 @@ app.get('/api/get-session-results', async (req, res) => {
 // Define API route to handle user sign-up
 app.post('/api/signup', async (req, res) => {
   try {
+    // Extract email and password from the request body
     const { email, password } = req.body;
-    const passwordHash = iRacingApi.encodePassword(email, password);
-    const user = await iRacingApi.saveUser(email, passwordHash);
-    res.json(user);
+
+    // Log the signup attempt
+    console.log(`Attempting to sign up user with email: ${email}`);
+
+    // Supabase Auth sign-up
+    const { user, session, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    // Check if there was an error during authentication
+    if (authError) {
+      console.error('Error during Supabase Auth sign-up:', authError.message);
+      return res.status(500).json({ error: 'Failed to sign up user with Supabase Auth' });
+    }
+
+    // Log successful authentication
+    console.log('Supabase Auth sign-up successful:', user.id);
+
+    // Insert the new user into the Users table
+    const { data, error: insertError } = await supabase
+      .from('Users')
+      .insert([{ email, user_id: user.id, created_at: new Date() }]);
+
+    // Check if there was an error during the insertion
+    if (insertError) {
+      console.error('Error saving user to Users table:', insertError.message);
+      return res.status(500).json({ error: 'Failed to save user in Users table' });
+    }
+
+    // Log successful insertion
+    console.log('User saved to Users table:', data);
+
+    // Send the user data back in the response
+    res.json(data);
   } catch (error) {
+    // Log any errors that occur during sign-up
     console.error('Error during sign-up:', error.message);
     res.status(500).json({ error: 'Failed to sign up user' });
   }
@@ -110,4 +145,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
