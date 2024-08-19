@@ -5,6 +5,7 @@ require('dotenv').config();
 const express = require('express'); // Express is a web framework for Node.js
 const path = require('path'); // Path is a module to handle and transform file paths
 const bodyParser = require('body-parser'); // Body-parser is middleware to parse incoming request bodies
+const cors = require('cors'); // CORS is middleware to enable Cross-Origin Resource Sharing
 const iRacingApi = require('./iRacingApi'); // Import the iRacing API module
 const supabase = require('./supabaseClient'); // Import the Supabase client
 
@@ -13,6 +14,9 @@ const app = express();
 
 // Use body-parser middleware to parse JSON request bodies
 app.use(bodyParser.json());
+
+// Use CORS middleware to enable CORS for all routes
+app.use(cors()); // This allows all origins by default. You can configure specific origins if needed.
 
 // Serve static files from the React app's build directory
 app.use(express.static(path.join(__dirname, '../../frontend/build')));
