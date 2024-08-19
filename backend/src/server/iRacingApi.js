@@ -23,6 +23,7 @@ const encodePassword = (email, password) => {
 // and stores the returned cookies for session management
 const authenticate = async () => {
   try {
+    console.log('Attempting to authenticate with iRacing API...');
     const passwordHash = encodePassword(IRACING_EMAIL, IRACING_PASSWORD);
 
     // Send a POST request to the iRacing API to authenticate the user
@@ -34,7 +35,7 @@ const authenticate = async () => {
     if (response.headers['set-cookie']) {
       // Store the cookies globally
       cookies = response.headers['set-cookie'];
-      console.log('Authenticated with iRacing');
+      console.log('Authenticated with iRacing, cookies saved.');
     } else {
       console.warn('Authentication succeeded but no cookies were received.');
     }
@@ -57,7 +58,9 @@ const clearCookies = () => {
 // This function re-authenticates with the iRacing API to keep the session alive
 const refreshAuthentication = async () => {
   try {
+    console.log('Attempting to refresh iRacing authentication...');
     await authenticate();
+    console.log('Authentication refreshed successfully.');
   } catch (error) {
     console.error('Error refreshing iRacing authentication:', error.message);
   }
@@ -68,9 +71,11 @@ const refreshAuthentication = async () => {
 const searchDriver = async (name) => {
   try {
     if (!cookies) {
+      console.log('No valid cookies found, attempting to authenticate...');
       await authenticate();
     }
 
+    console.log(`Searching for driver with name: ${name}`);
     const response = await axios.get('https://members-ng.iracing.com/data/member/get', {
       headers: {
         Cookie: cookies.join('; '),
@@ -81,6 +86,7 @@ const searchDriver = async (name) => {
       },
     });
 
+    console.log('Driver search completed.');
     return response.data[0]; // Adjust based on actual response structure
   } catch (error) {
     clearCookies(); // Clear cookies in case of an error and re-attempt the authentication
@@ -93,6 +99,7 @@ const searchDriver = async (name) => {
 // This function inserts the user data into the Supabase Users table and handles any errors
 const saveUser = async (email, passwordHash) => {
   try {
+    console.log(`Attempting to save user with email: ${email}`);
     const { data, error } = await supabase
       .from('Users')
       .insert([{ email, password_hash: passwordHash }]);
@@ -114,6 +121,7 @@ const saveUser = async (email, passwordHash) => {
 // This function caches driver search results in the Supabase database to reduce API load
 const saveDriverSearchResult = async (searchTerm, result) => {
   try {
+    console.log(`Attempting to save driver search result for term: ${searchTerm}`);
     const { data, error } = await supabase
       .from('DriverSearchCache')
       .insert([{ search_term: searchTerm, result }]);
