@@ -15,7 +15,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Serve static files from the React app's build directory
-app.use(express.static(path.join(__dirname, '../build')));
+app.use(express.static(path.join(__dirname, '../../frontend/build')));
 
 // Define API route for authentication with the iRacing API
 app.post('/api/authenticate', async (req, res) => {
@@ -42,60 +42,6 @@ app.get('/api/search-driver', async (req, res) => {
   } catch (error) {
     console.error('Error searching for driver:', error.message);
     res.status(500).json({ error: 'Failed to search for driver' });
-  }
-});
-
-// Define API route to retrieve car data
-app.get('/api/get-cars', async (req, res) => {
-  console.log('Received GET request to /api/get-cars');
-  try {
-    const cars = await iRacingApi.getCars();
-    console.log('Car data retrieval successful, sending data...');
-    res.json(cars);
-  } catch (error) {
-    console.error('Error retrieving car data:', error.message);
-    res.status(500).json({ error: 'Failed to retrieve car data' });
-  }
-});
-
-// Define API route to retrieve track data
-app.get('/api/get-tracks', async (req, res) => {
-  console.log('Received GET request to /api/get-tracks');
-  try {
-    const tracks = await iRacingApi.getTracks();
-    console.log('Track data retrieval successful, sending data...');
-    res.json(tracks);
-  } catch (error) {
-    console.error('Error retrieving track data:', error.message);
-    res.status(500).json({ error: 'Failed to retrieve track data' });
-  }
-});
-
-// Define API route to retrieve member information
-app.get('/api/get-member-info', async (req, res) => {
-  console.log('Received GET request to /api/get-member-info');
-  try {
-    const memberInfo = await iRacingApi.getMemberInfo();
-    console.log('Member information retrieval successful, sending data...');
-    res.json(memberInfo);
-  } catch (error) {
-    console.error('Error retrieving member information:', error.message);
-    res.status(500).json({ error: 'Failed to retrieve member information' });
-  }
-});
-
-// Define API route to retrieve session results
-app.get('/api/get-session-results', async (req, res) => {
-  console.log('Received GET request to /api/get-session-results');
-  try {
-    const { subsession_id } = req.query;
-    console.log(`Retrieving session results for subsession_id: ${subsession_id}`);
-    const results = await iRacingApi.getSessionResults(subsession_id);
-    console.log('Session results retrieval successful, sending data...');
-    res.json(results);
-  } catch (error) {
-    console.error('Error retrieving session results:', error.message);
-    res.status(500).json({ error: 'Failed to retrieve session results' });
   }
 });
 
@@ -139,7 +85,7 @@ app.post('/api/signup', async (req, res) => {
 // Catch-all route that returns the React app for any other routes
 app.get('*', (req, res) => {
   console.log('Serving React app for unmatched route...');
-  res.sendFile(path.join(__dirname, '../build/index.html'));
+  res.sendFile(path.join(__dirname, '../../frontend/build/index.html'));
 });
 
 // Define the port on which the server will listen
