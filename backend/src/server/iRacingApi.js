@@ -23,7 +23,6 @@ const encodePassword = (email, password) => {
 // and stores the returned cookies for session management
 const authenticate = async () => {
   try {
-    // Encode the password using SHA256 and Base64
     const passwordHash = encodePassword(IRACING_EMAIL, IRACING_PASSWORD);
 
     // Send a POST request to the iRacing API to authenticate the user
@@ -32,7 +31,6 @@ const authenticate = async () => {
       password: passwordHash,
     });
 
-    // Check if the response contains cookies
     if (response.headers['set-cookie']) {
       // Store the cookies globally
       cookies = response.headers['set-cookie'];
@@ -69,15 +67,13 @@ const refreshAuthentication = async () => {
 // This function checks for valid cookies, authenticates if necessary, and then performs the search
 const searchDriver = async (name) => {
   try {
-    // If no cookies are present, authenticate before making the request
     if (!cookies) {
       await authenticate();
     }
 
-    // Perform a GET request to search for the driver using the stored cookies
     const response = await axios.get('https://members-ng.iracing.com/data/member/get', {
       headers: {
-        Cookie: cookies.join('; '), // Join the cookies array into a single string
+        Cookie: cookies.join('; '),
       },
       params: {
         cust_ids: name, // Use the correct parameter to search by name
@@ -85,12 +81,10 @@ const searchDriver = async (name) => {
       },
     });
 
-    // Return the first result from the response data
     return response.data[0]; // Adjust based on actual response structure
   } catch (error) {
-    // Clear cookies in case of an error and re-attempt the authentication
+    clearCookies(); // Clear cookies in case of an error and re-attempt the authentication
     console.error('Error searching for driver:', error.message);
-    clearCookies();
     throw new Error('Failed to search for driver');
   }
 };

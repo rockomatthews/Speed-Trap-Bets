@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { supabase } from '../supabaseClient';
 import Header from '../components/Header';
 import { Box } from '@mui/material';
 
@@ -44,12 +43,6 @@ function Dashboard() {
 
     initAuth();
   }, []);
-
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.error('Error logging out:', error.message);
-    else console.log('Logged out successfully');
-  };
 
   return (
     <Box>
