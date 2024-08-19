@@ -17,11 +17,12 @@ const encodePassword = (email, password) => {
 const authenticate = async () => {
   try {
     console.log('Attempting to authenticate with iRacing API...');
-    const passwordHash = encodePassword(IRACING_EMAIL, IRACING_PASSWORD);
+    const emailLower = IRACING_EMAIL.toLowerCase();
+    const encodedPassword = encodePassword(IRACING_EMAIL, IRACING_PASSWORD);
 
     const body = {
-      email: IRACING_EMAIL,
-      password: passwordHash,
+      email: emailLower,
+      password: encodedPassword,
     };
 
     const response = await axios.post('https://members-ng.iracing.com/auth', body, {
